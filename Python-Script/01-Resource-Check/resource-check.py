@@ -3,7 +3,7 @@
 # OS: Ubuntu
 
 try:
-    import psutil, subprocess
+    import psutil, subprocess, os
 
 except ImportError as i_err:
     print(i_err)
@@ -17,7 +17,6 @@ def ip_addr(ip_addr):
         return ip_addr_strip
     
         
-
 def check_ip_conn():
     '''Send ICMP message to the servers'''
     ip_txt = 'ip_addr.txt'
@@ -32,6 +31,15 @@ def check_ip_conn():
             
             if out:
                  print(f"{ip} - Ok")
+                 load1, load5, load15 = psutil.getloadavg()
+
+                 cpu_util = (load15/os.cpu_count()) * 100
+                
+                 mem_util = psutil.virtual_memory()[3]
+
+                 utils = [cpu_util, mem_util]
+
+                 print(utils)
     
 
 if __name__ == "__main__":
