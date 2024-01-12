@@ -1,0 +1,17 @@
+# Creating a backup repository to the destination.
+#
+- git: ssh://git@192.168.100.30:4222/testing
+  version: master
+  files: 
+    - src: codes-dir/
+      dst: gilt-backup/codes/
+  post_commands:
+      make test
+
+- git: ssh://git@192.168.100.30:4222/sysadmin
+  version: master
+  files:
+    - src: codes/ 
+      dst: gilt-backup/sysadmin/
+  post_commands:
+      make
