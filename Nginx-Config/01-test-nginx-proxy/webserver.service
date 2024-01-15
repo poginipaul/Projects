@@ -3,6 +3,7 @@ Description=Test webserver with gunicorn
 After=network.target
 
 [Service]
+<<<<<<< HEAD
 User=paul
 Group=www-data
 
@@ -12,6 +13,13 @@ WorkingDirectory=/home/paul/web-proj
 #Executables
 Environment="PATH=/home/paul/web-proj/web-proj-env/bin"
 ExecStart=/home/paul/web-proj/web-proj-env/bin/gunicorn --workers 3 --bin unix:/web-proj.sock -m 007 wsgi:app
+=======
+User=root
+Group=www-data
+WorkingDirectory=/root/web-proj
+Environment="PATH=/root/web-proj/web-proj-env/bin"
+ExecStart=/root/web-proj/web-proj-env/bin/gunicorn --workers 3 --bin unix:/web-proj.sock -m 007 wsgi:app
+>>>>>>> 64329745850358db94cc05a3f77e9bf4c898b56e
 
 [Install]
 WantedBy=multi-user.target
