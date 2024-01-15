@@ -1,0 +1,18 @@
+[Unit]
+Description=Test webserver with gunicorn
+After=network.target
+
+[Service]
+User=paul
+Group=www-data
+
+#Where to fetch the data
+WorkingDirectory=/home/paul/web-proj
+
+#Executables
+Environment="PATH=/home/paul/web-proj/web-proj-env/bin"
+ExecStart=/home/paul/web-proj/web-proj-env/bin/gunicorn --workers 3 --bin unix:/web-proj.sock -m 007 wsgi:app
+
+[Install]
+WantedBy=multi-user.target
+
