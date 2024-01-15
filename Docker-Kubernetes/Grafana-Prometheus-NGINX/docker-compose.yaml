@@ -1,0 +1,79 @@
+# Purpose: Creation of nginx, nginx-exporter, node-exporter, premetheus and grafana containers.
+
+version: '3.8'
+
+volumes:
+  prometheus-data: {}
+  grafana-data: {}
+
+services:
+  # Prometheus Node Exporter Details
+  node_exporter:
+    image: quay.io/prometheus/node-exporter:latest
+    container_name: node_exporter
+    
+    command:
+      - '--path.rootfs=/host'    
+    
+    network_mode: host
+    pid: host
+    
+    restart: unless-stopped
+
+    volumes:
+      - '/:/host:ro,rslave'
+
+  # Prometheus
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    
+    ports:
+      - '9090:9090'
+    
+    restart: unless-stopped
+    
+    volumes:
+      - ./prometheus/prometheus.yaml:/etc/prometheus/prometheus.yaml
+      - prometheus-data:/prometheus
+
+    command:
+      - '--web.enable-lifecycle'
+      - '--config.file=/etc/prometheus/prometheus.yaml'
+
+  # NGINX latest
+  nginx:
+    image: nginx:latest
+    container_name: nginx
+    restart: always
+    
+    ports:
+      - 80:80
+      - 443:443
+
+  # NGINX Exporter --> To be able to detect nginx metrics to prometheus
+  nginx-exporter:
+    image: nginx/nginx-prometheus-exporter
+    
+    ports:
+      - '9113:9113'
+    
+    command:
+      #- -nginx.scrape-uri
+      - -nginx.scrape-uri=http://nginx/stub_status
+
+    depends_on:
+      - prometheus
+
+  # Grafana - for data visualization
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    
+    ports:
+      - '3000:3000'
+    
+    restart: unless-stopped
+    
+    volumes:
+      - grafana-data:/var/lib/grafana

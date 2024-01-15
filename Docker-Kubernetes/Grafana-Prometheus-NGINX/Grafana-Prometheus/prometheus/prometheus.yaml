@@ -1,0 +1,15 @@
+global:
+  scrape_interval: 1m
+
+scrape_configs:
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'node'
+    static_configs:
+      - targets: ['192.168.100.162:9100'] # It's possible to change the host's ip address to its fqdn.
+
+  - job_name: 'nginx'
+    static_configs:
+      - targets: ['192.168.100.162:9113']
