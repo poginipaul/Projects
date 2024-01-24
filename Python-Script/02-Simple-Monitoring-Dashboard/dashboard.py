@@ -7,42 +7,124 @@ try:
     import psutil as ps # pip3 install psutil
     import db_conn as db
     import pandas as pd # pip3 install pandas
+    import paramiko # pip3 instal paramiko
+    import subprocess as sp
+    import pandas as pd
+    import psycopg2
 
 except ImportError as i_err:
     print(i_err)
 
-d1 = [100, 50, 101]
-d2 = [20, 35, 22]
+st.set_page_config(page_title="Simple Dashboard",
+                   initial_sidebar_state="auto")
+
+st.header("Simple Dashboard")
+
+def get_conn():
+    icmp_ip_addr = sp.Popen('ping, ')
+    
 
 def psql_db():
-    dbase = db.dbase()
+    # Variables from the database connection function.
+    db_connect, db_cursor = db.dbase()
+
+    if db_connect is None or db_cursor is None:
+        print("Failed to connect to the database.")
+        return
+
+    #db_cursor.execute("DROP TABLE IF EXISTS ip_add_tb")
+
+    #db_cursor.execute("CREATE TABLE ip_add_tb (ID SERIAL PRIMARY KEY, \
+     #                 IP_ADDRESS VARCHAR(50))")
+    
+    #db_cursor.execute("INSERT INTO TABLE ip_add_tb (ID, IP_Address)\
+     #                 VALUES (1, '192.168.100.164')")
+
+    db_cursor.execute("SELECT * FROM ip_add_tb")
+
+    row = db_cursor.fetchall()
+
+    sql = st.connection
+
+    df = pd.DataFrame(row)
+
+    st.dataframe(df)
+
+@st.cache_resource
+def st_psql_conn():
+    return psycopg2.connect(**st.secrets["postgres"])
+
+conn = st_psql_conn()
+
+def run_query(query):
+        with conn.cursor() as cur:
+            cur.execute(query)
+            return cur.fetchall()
 
 def main():
-    '''Data visualization for server monitoring'''
-
-    st.title("Simple Dashboard")
+    '''Network Monitoring for on-prem servers.'''
 
     # To css file.
     with open("assets/style.css") as styles:
-        st.markdown(f'<style rel="stylesheet" href={styles}>', 
+        st.markdown(f'<style rel="stylesheet" type="text/css" href={styles}>', 
                     unsafe_allow_html=True)
-    
 
+    # System Usage of Localhost.   
+    # Setting variables where to fetch data.
     cpu = ps.cpu_percent()
     memory = ps.virtual_memory()
-    print(cpu)
+    disk = ps.disk_usage('/')
 
-    # Show system resources
+    # Connected remote servers.
+    # Localhost column
+    cpu_col, ram_col, disk_col = st.columns(3)
 
-    dashboard = st.columns(5)
-    server_progress = CircularProgress(
-        label="Test",
-        value=int(cpu),
-        key="server_progress")
+    # CPU usage by percentage.
+    with cpu_col:
+        cpu_progress = CircularProgress(
+            label="CPU",
+            value=int(cpu),
+            key="cpu_progress",
+            color="#355e3b",
+            size="large"
+            )
+        
+        cpu_progress.st_circular_progress()
     
-    server_progress.st_circular_progress()
+    # Memory usage by percentage.
+    with ram_col:
+        ram_progress = CircularProgress(
+            label="Memory",
+            value=int(memory[2]),
+            key="ram_progress",
+            color="#355e3b",
+            size="large"
+            )
+        
+        ram_progress.st_circular_progress()
+    
+    # Disk usage by percentage.
+    with disk_col:
+        disk_progress = CircularProgress(
+            label="Disk",
+            value=int(disk[3]),
+            key="disk_progress",
+            color="#355e3b",
+            size="large"
+            )
+        
+        disk_progress.st_circular_progress()
+
+
+
+    rows = run_query("SELECT * FROM ip_add_tb")
+    data = pd.DataFrame(rows, columns=['ID', 'IP_Address'])
+    st.table(data)
+
+
 
 
 
 if __name__ == "__main__":
     main()
+    

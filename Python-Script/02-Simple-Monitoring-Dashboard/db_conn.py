@@ -25,7 +25,15 @@ def dbase():
         ) as db_connect:
             db_cursor = db_connect.cursor()
 
-            return db_cursor
+            if db_cursor:
+                return
+            
+            #db_cursor.execute("SELECT * FROM ip_add_tb")
+
+            #row = db_cursor.fetchall()
+
+            #for r in row:
+             #   print(r)            
     
     except pg.Error as pg_err:
         print(pg_err)
