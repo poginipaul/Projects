@@ -87,12 +87,11 @@ def main():
             )
         
         disk_progress.st_circular_progress()
-
-
-
+    
+    # Show currently connected server.
     rows = run_query("SELECT * FROM ip_add_tb")
-    data = pd.DataFrame(rows, columns=['ID', 'IP_Address'])
-    st.table(data)
+    data = pd.DataFrame(rows, columns = ["ID", "IP Address"])
+    st.dataframe(data)
 
 
 
