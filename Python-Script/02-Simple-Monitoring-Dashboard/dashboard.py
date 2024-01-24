@@ -5,7 +5,6 @@ try:
     import streamlit as st # pip3 install streamlit
     from st_circular_progress import CircularProgress # pip3 install st-circular-progress
     import psutil as ps # pip3 install psutil
-    import db_conn as db
     import pandas as pd # pip3 install pandas
     import paramiko # pip3 instal paramiko
     import subprocess as sp
@@ -22,33 +21,7 @@ st.header("Simple Dashboard")
 
 def get_conn():
     icmp_ip_addr = sp.Popen('ping, ')
-    
-
-def psql_db():
-    # Variables from the database connection function.
-    db_connect, db_cursor = db.dbase()
-
-    if db_connect is None or db_cursor is None:
-        print("Failed to connect to the database.")
-        return
-
-    #db_cursor.execute("DROP TABLE IF EXISTS ip_add_tb")
-
-    #db_cursor.execute("CREATE TABLE ip_add_tb (ID SERIAL PRIMARY KEY, \
-     #                 IP_ADDRESS VARCHAR(50))")
-    
-    #db_cursor.execute("INSERT INTO TABLE ip_add_tb (ID, IP_Address)\
-     #                 VALUES (1, '192.168.100.164')")
-
-    db_cursor.execute("SELECT * FROM ip_add_tb")
-
-    row = db_cursor.fetchall()
-
-    sql = st.connection
-
-    df = pd.DataFrame(row)
-
-    st.dataframe(df)
+    pass
 
 @st.cache_resource
 def st_psql_conn():
